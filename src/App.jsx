@@ -4,6 +4,7 @@ import StaticMap from "react-map-gl";
 import axios from "axios";
 import { RenderLayers } from "./deck.gl-layer.jsx";
 
+// renders the map layer below the columnlayer
 const MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoianRvcmxlc3AiLCJhIjoiY2w1MXR0Y2xtMDVvbTNkbjk2eHcxN3g3YSJ9.YgC4FjfuvC23H7kh0fg6lg";
 const mapStyle = "mapbox://styles/jtorlesp/cl51tnhls004b14qfsua2jxy2";
@@ -26,30 +27,29 @@ const App = () => {
   }, []);
 
   const fetchData = async () => {
-    axios
-      .all([axios.get("https://disease.sh/v2/countries?allowNull=false")])
-      .then(
-        axios.spread((World) => {
-          let data = World.data || [];
-          data = data.map(function (location) {
-            return {
-              active: location.active,
-              country: location.country,
-              continent: location.continent,
-              coordinates: [
-                location.countryInfo.long,
-                location.countryInfo.lat,
-              ],
-            };
-          });
-          data = data.filter((location) => location.continent === "Europe");
-          setDataset(data);
-        })
-      )
-      .catch((error) => {
-        console.log(error);
-        return [];
+    // https://medium.com/weekly-webtips/an-introduction-into-deck-gl-f5c8ae84d9a5
+
+    // axios.all and axios.spread are deprecated
+    try {
+      Promise.all([
+        axios.get("https://disease.sh/v2/countries?allowNull=false"),
+      ]).then((res) => {
+        let data = res[0].data || [];
+        data = data.map((location) => {
+          return {
+            active: location.active,
+            country: location.country,
+            continent: location.continent,
+            coordinates: [location.countryInfo.long, location.countryInfo.lat],
+          };
+        });
+
+        data = data.filter((location) => location.continent === "Europe");
+        setDataset(data);
       });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   console.log(dataset);
