@@ -60,8 +60,12 @@ const App = () => {
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
         layers={RenderLayers({ data: dataset })}
-      />
-      <StaticMap mapStyle={mapStyle} mapboxAccessToken={MAPBOX_ACCESS_TOKEN} />
+      >
+        <StaticMap
+          mapStyle={mapStyle}
+          mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
+        />
+      </DeckGL>
     </div>
   );
 };
